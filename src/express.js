@@ -18,13 +18,13 @@ app.use('/api/v1/weather', weatherRoutes);
 app.use('/api/v1/rule', ruleRoutes);
 // console.log()
 app.use('/api/v1',ruleRoutes);
-// app.use('/*',(req,res)=>{
-//     console.log(req.body);
-//     res.status(200).json({
-//         success:true,
-//         message:'wrong url'
-//     })
-// });
+app.use('/*',(req,res)=>{
+    console.log(req.body);
+    res.status(200).json({
+        success:true,
+        message:'wrong url'
+    })
+});
 
 
 app.use(errorMiddleware);
