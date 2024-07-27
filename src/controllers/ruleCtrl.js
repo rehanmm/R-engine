@@ -112,6 +112,7 @@ const combineRules=catchAsyncError(async function(req,res){
     const rule=new Rule({
         name,
         ruleString:v,
+        isCombined:true,
         AST:JSON.stringify(ast),
         params:JSON.stringify(m)
     })

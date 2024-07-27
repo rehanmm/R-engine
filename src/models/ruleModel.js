@@ -2,6 +2,10 @@ const mongoose  = require("mongoose");
 
 const ruleSchema = new mongoose.Schema({
   name:String,
+  isCombined:{
+    type:Boolean,
+    default:false
+  },
   ruleString: {
     type: [String],
     // required: [true, "please provide a title"],
