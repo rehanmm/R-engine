@@ -99,36 +99,24 @@ const verifyUserData=catchAsyncError( async function(req ,res){
 })
 const combineRules=catchAsyncError(async function(req,res){
     //ruleid:[]
-    const {ruleId}=req.body;
-    console.log(req.body);
-    let resAst={};
-    const ruleStrings=[];
-    console.log(ruleId);
-    ruleId.forEach(async rid => {
-     const rule1=await Rule.findById(rid);
+    const {ruleString}=req.body;
+    const substrings = ruleString.split('#');
+    const result = substrings.map(substring => `(${substring})`).join(' AND ');
 
-     ruleStrings.push(rule1.ruleString[0]);
-    resAst=combineASTs(JSON.parse(rule1.AST),resAst);
-    });
-    // for(let i=0;i<ruleId.lenght;i++){
-    //  const rule1=await Rule.findById(ruleId[i]);
-    //  console.log(i);
-    //  ruleStrings.push(rule1.ruleString[0]);
-    // resAst=combineASTs(JSON.parse(rule1.AST),resAst);
-    // }
-    console.log(resAst,ruleStrings);
+    const ast=astToJson(parseRuleString(result));
     const m=[];
-    getParams(resAst,m)
-    const newRule=await Rule({
-        ruleString:ruleStrings,
-        AST:resAst,
-        params:m
+    getParams(ast,m)
+    const v=[];
+    v.push(ruleString);
+    const rule=new Rule({
+        ruleString:v,
+        AST:JSON.stringify(ast),
+        params:JSON.stringify(m)
     })
-    await newRule.save();
+    await rule.save()
     res.status(200).json({
         success:true,
-        message:'merged successfully',
-        data:newRule
+        data:rule
     })
     
 })
