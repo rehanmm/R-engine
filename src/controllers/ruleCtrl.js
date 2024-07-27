@@ -38,8 +38,8 @@ const read=catchAsyncError( function(req ,res){
     })
 })
 const remove= catchAsyncError( async function(req ,res){
-    const note=await Rule.findByIdAndDelete(req.note._id)
-    // console.log(note);
+    const rule=await Rule.findByIdAndDelete(req.rule._id)
+    // console.log(rule);
     res.status(200).json({
         success:true,
         message:'deleted successfully'
@@ -69,7 +69,7 @@ const ruleById=catchAsyncError( async function(req ,res,next){
     const {ruleId}=req.params
     const rule=await Rule.findById(ruleId);
     if(!rule){
-        return next(new errorHandler('notes not found',404))
+        return next(new errorHandler('rules not found',404))
     }
     req.rule=rule;
     next()
@@ -80,7 +80,7 @@ const verifyUserData=catchAsyncError( async function(req ,res){
     const userData =req.body;
     const rule=req.rule;
     if(!rule){
-        return next(new errorHandler('notes not found',404))
+        return next(new errorHandler('rule not found',404))
     }
     const str="((age > 30 AND department == 'Marketing')) AND (salary > 20000 OR experience > 5)";
     // console.log(typeof(str));
