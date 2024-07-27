@@ -11,13 +11,14 @@ const list=catchAsyncError(  async function(req ,res,){
     paginationFeature({limit:6,page},Rule,res)
 })
 const create=catchAsyncError( async function(req ,res){
-    const {ruleString}=req.body;
+    const {ruleString,name}=req.body;
     const ast=astToJson(parseRuleString(ruleString));
     const m=[];
     getParams(ast,m)
     const v=[];
     v.push(ruleString);
     const rule=new Rule({
+        name,
         ruleString:v,
         AST:JSON.stringify(ast),
         params:JSON.stringify(m)
@@ -99,16 +100,17 @@ const verifyUserData=catchAsyncError( async function(req ,res){
 })
 const combineRules=catchAsyncError(async function(req,res){
     //ruleid:[]
-    const {ruleString}=req.body;
+    const {ruleString,name}=req.body;
     const substrings = ruleString.split('#');
-    const result = substrings.map(substring => `(${substring})`).join(' AND ');
+    const result = substrings.map(substring => `(${substring.trim()})`).join(' AND ');
 
     const ast=astToJson(parseRuleString(result));
     const m=[];
     getParams(ast,m)
     const v=[];
-    v.push(ruleString);
+    v.push(result);
     const rule=new Rule({
+        name,
         ruleString:v,
         AST:JSON.stringify(ast),
         params:JSON.stringify(m)
