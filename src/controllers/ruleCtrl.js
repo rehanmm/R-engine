@@ -11,7 +11,8 @@ const list=catchAsyncError(  async function(req ,res,){
     paginationFeature({limit:6,page},Rule,res)
 })
 const create=catchAsyncError( async function(req ,res){
-    const {ruleString,name}=req.body;
+    let {ruleString,name}=req.body;
+    ruleString=ruleString.replace(/=/g, '==');
     const ast=astToJson(parseRuleString(ruleString));
     const m=[];
     getParams(ast,m)
@@ -50,7 +51,8 @@ const remove= catchAsyncError( async function(req ,res){
 
 
 const update=catchAsyncError( async function(req ,res){
-    const {name,ruleString}=req.body;
+    let {name,ruleString}=req.body;
+    ruleString=ruleString.replace(/=/g, '==');
     const {_id}=req.rule
     const rule=await Rule.findByIdAndUpdate(_id,{  
         name,
@@ -84,7 +86,6 @@ const verifyUserData=catchAsyncError( async function(req ,res){
     if(!rule){
         return next(new errorHandler('rule not found',404))
     }
-    const str="((age > 30 AND department == 'Marketing')) AND (salary > 20000 OR experience > 5)";
     // console.log(typeof(str));
     const ast = parseRuleString(req.rule.ruleString[0]);
     // console.log(ast)
@@ -101,10 +102,10 @@ const verifyUserData=catchAsyncError( async function(req ,res){
 })
 const combineRules=catchAsyncError(async function(req,res){
     //ruleid:[]
-    const {ruleString,name}=req.body;
+    let {ruleString,name}=req.body;
     const substrings = ruleString.split('#');
     const result = substrings.map(substring => `(${substring.trim()})`).join(' AND ');
-
+    ruleString=ruleString.replace(/=/g, '==');
     const ast=astToJson(parseRuleString(result));
     const m=[];
     getParams(ast,m)
@@ -191,7 +192,6 @@ function parseRuleString(ruleString) {
         const left = tokens[index++];
         const operator = tokens[index++];
         const right = tokens[index++];
-        if(operator==='=') operator+='=';
         const value = `${left} ${operator} ${right}`;
         return new Node('operand', null, null, value);
     }
@@ -240,6 +240,7 @@ function evaluateDFS(node, userData) {
         const condition = node.value.replace(/(\w+)/g, (match) => {
             return userData.hasOwnProperty(match) ? JSON.stringify(userData[match]) : match;
         });
+        console.log(condition);
         return eval(condition);
     } else if (node.type === 'operator') {
         const leftValue = evaluateDFS(node.left, userData);
