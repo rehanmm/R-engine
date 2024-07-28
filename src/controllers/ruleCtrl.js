@@ -12,7 +12,7 @@ const list=catchAsyncError(  async function(req ,res,){
 })
 const create=catchAsyncError( async function(req ,res){
     let {ruleString,name}=req.body;
-    ruleString=ruleString.replace(/=/g, '==');
+    ruleString=ruleString.replace(/([^=|^!])=([^=])/g, '$1==$2');
     const ast=astToJson(parseRuleString(ruleString));
     const m=[];
     getParams(ast,m)
@@ -52,7 +52,7 @@ const remove= catchAsyncError( async function(req ,res){
 
 const update=catchAsyncError( async function(req ,res){
     let {name,ruleString}=req.body;
-    ruleString=ruleString.replace(/=/g, '==');
+    ruleString=ruleString.replace(/([^=|^!])=([^=])/g, '$1==$2');
     const {_id}=req.rule
     const rule=await Rule.findByIdAndUpdate(_id,{  
         name,
@@ -105,7 +105,7 @@ const combineRules=catchAsyncError(async function(req,res){
     let {ruleString,name}=req.body;
     const substrings = ruleString.split('#');
     const result = substrings.map(substring => `(${substring.trim()})`).join(' AND ');
-    ruleString=ruleString.replace(/=/g, '==');
+    ruleString=ruleString.replace(/([^=|^!])=([^=])/g, '$1==$2');
     const ast=astToJson(parseRuleString(result));
     const m=[];
     getParams(ast,m)
