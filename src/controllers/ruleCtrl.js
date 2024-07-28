@@ -50,9 +50,10 @@ const remove= catchAsyncError( async function(req ,res){
 
 
 const update=catchAsyncError( async function(req ,res){
-    const {ruleString}=req.body;
+    const {name,ruleString}=req.body;
     const {_id}=req.rule
     const rule=await Rule.findByIdAndUpdate(_id,{  
+        name,
         ruleString:[ruleString],
         AST:JSON.stringify(astToJson(parseRuleString(ruleString)))
     },{new:true,runValidators:true})
@@ -190,7 +191,7 @@ function parseRuleString(ruleString) {
         const left = tokens[index++];
         const operator = tokens[index++];
         const right = tokens[index++];
-        
+        if(operator==='=') operator+='=';
         const value = `${left} ${operator} ${right}`;
         return new Node('operand', null, null, value);
     }
